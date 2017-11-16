@@ -1,0 +1,87 @@
+install.packages("scatterpie")
+install.packages("Cairo")
+library("ggplot2")
+library("scatterpie")
+library("Cairo")
+#数据集构造
+#排列所有数据
+mydata<-c(1,1,1,1,1,1,1,1,1,2,3,2,3,5,5,1,1,1,1,1,2,2,4,5,1,3,2,3,5,5,4,2,4,2,1,2,1,1,0.5,0.5)
+#定义时间跨度
+Year<-2004:2011
+#限定mydata里的数据的时间归属
+Dummy<-5*seq(1:8) 
+#定义每个时间的样本总量
+Data<-c(5,6,18,5,14,18,13,5)
+#定义矩阵按8行5列排列
+mynewdata<-matrix(mydata,nrow=8,ncol=5,byrow=T) 
+#定义列名
+colnames(mynewdata)<-c("S1","S2","S3","S4","S5") 
+#初始化数据框
+mynewdata<-as.data.frame(mynewdata) 
+#把不同数据合并为同一个矩阵（这也可以解释为什么上一步要转化位数据框）
+mynewdata1<-cbind(Year,Dummy,Data,mynewdata) 
+#从mynewdata1中提取两行数据并强行转化为整数
+as.integer(mynewdata1$Dummy) 
+as.integer(mynewdata1$Year)
+#构造色盘
+color1<-c("#FF2D2D","#F79646","#4BACC6","#FFC000","#92D050")
+color2<-c("#17375E","#23538D","#558ED5","#8EB4E3","#C6D9F1")
+#色盘1图表输出
+
+#画折线图并输出
+CairoPNG(file="F:\\Doctor\\R语言学习\\自学\\scatterpie3.png",width=500,height=330)
+ggplot()+
+  geom_line(data=mynewdata1,aes(x=Dummy,y=Data,group=1),col="#085264",size=.8)+
+#与上句语法相同
+  ggplot(data=mynewdata1,aes(x=Dummy,y=Data,group=1))+
+  geom_line(col="#085264",size=.8)+
+#在线图原有的图层上画泡状饼图（取mynewdata1里的4到8列数据）
+  geom_scatterpie(data=mynewdata1,aes(x=Dummy,y=Data,r=2),cols=colnames(mynewdata1)[4:8],color=NA)+
+#扩展y轴
+  ylim(0,25)+
+#填入色盘1
+  scale_fill_manual(values=color1)+
+#将坐标轴改为相应年份
+  scale_x_continuous(breaks=mynewdata1$Dummy,labels=c(2004:2011))+
+#将图例的文字显示放置在图形标识的上面
+  guides( fill=guide_legend(label.position ="top"))+
+#更改主题参数
+  theme(
+    #去掉x轴标题
+    axis.title=element_blank(),
+    #去掉图例标题
+    legend.title=element_blank(),
+    #将背景设置为空白
+    panel.background=element_blank(),
+    #加上坐标轴线
+    axis.line=element_line(),
+    #加上坐标轴刻度线
+    axis.ticks=element_line(),
+    #将图例方向改为水平
+    legend.direction="horizontal",
+    #修改图例位置
+    legend.position=c(0.15,0.9),
+  )
+#关闭图形输出设备
+dev.off()
+#打开图形输出设备
+dev.new()
+#色盘2输出
+CairoPNG(file="F:\\Doctor\\R语言学习\\自学\\scatterpie2.png",width=500,height=330)
+ggplot()+
+  geom_line(data=mynewdata1,aes(x=Dummy,y=Data,group=1),col="#085264",size=.8)+
+  geom_scatterpie(data=mynewdata1,aes(x=Dummy,y=Data,r=2),cols=colnames(mynewdata1)[4:8],color=NA)+
+  ylim(0,25)+
+  scale_fill_manual(values=color2)+
+  scale_x_continuous(breaks=mynewdata1$Dummy,labels=c(2004:2011))+
+  guides( fill=guide_legend(label.position ="top"))+
+  theme(
+    axis.title=element_blank(),
+    legend.title=element_blank(),
+    panel.background=element_blank(),
+    axis.line=element_line(),
+    axis.ticks=element_line(),
+    legend.direction="horizontal",
+    legend.position=c(0.15,0.9),
+  )
+dev.off()
